@@ -4,26 +4,30 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.techyourchance.mvc.R;
-import com.techyourchance.mvc.common.Constants;
-import com.techyourchance.mvc.networking.QuestionSchema;
-import com.techyourchance.mvc.networking.QuestionsListResponseSchema;
-import com.techyourchance.mvc.networking.StackoverflowApi;
+import com.techyourchance.mvc.questions.FetchQuestionsUseCase;
 import com.techyourchance.mvc.questions.Question;
 import com.techyourchance.mvc.screens.common.BaseActivity;
 import com.techyourchance.mvc.screens.questiondetails.QuestionDetailsActivity;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.List;
 
 public class QuestionsListActivity extends BaseActivity implements QuestionsListViewMvcImpl.Listener {
 
-    private StackoverflowApi mStackoverflowApi;
-
     private QuestionsListViewMvc mViewMvc;
+    private FetchQuestionsUseCase mFetchQuestions;
+    private final FetchQuestionsUseCase.Listener listener = new FetchQuestionsUseCase.Listener() {
+        @Override
+        public void onSuccess(List<? extends Question> data) {
+            mViewMvc.bindQuestions((List<Question>) data);
+        }
+
+        @Override
+        public void onError(@NotNull Throwable t) {
+            Toast.makeText(QuestionsListActivity.this, R.string.error_network_call_failed, Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,7 @@ public class QuestionsListActivity extends BaseActivity implements QuestionsList
         mViewMvc = getCompositionRoot().getViewMvcFactory().getQuestionsListViewMvc(null);
         mViewMvc.registerListener(this);
 
-        mStackoverflowApi = getCompositionRoot().getStackoverflowApi();
+        mFetchQuestions = getCompositionRoot().getFetchQuestionsUseCase();
 
         setContentView(mViewMvc.getRootView());
     }
@@ -40,38 +44,18 @@ public class QuestionsListActivity extends BaseActivity implements QuestionsList
     @Override
     protected void onStart() {
         super.onStart();
+        mFetchQuestions.registerListener(listener);
         fetchQuestions();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mFetchQuestions.unregisterListener(listener);
+    }
+
     private void fetchQuestions() {
-        mStackoverflowApi.fetchLastActiveQuestions(Constants.QUESTIONS_LIST_PAGE_SIZE)
-                .enqueue(new Callback<QuestionsListResponseSchema>() {
-                    @Override
-                    public void onResponse(Call<QuestionsListResponseSchema> call, Response<QuestionsListResponseSchema> response) {
-                        if (response.isSuccessful()) {
-                            bindQuestions(response.body().getQuestions());
-                        } else {
-                            networkCallFailed();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<QuestionsListResponseSchema> call, Throwable t) {
-                        networkCallFailed();
-                    }
-                } );
-    }
-
-    private void bindQuestions(List<QuestionSchema> questionSchemas) {
-        List<Question> questions = new ArrayList<>(questionSchemas.size());
-        for (QuestionSchema questionSchema : questionSchemas) {
-            questions.add(new Question(questionSchema.getId(), questionSchema.getTitle()));
-        }
-        mViewMvc.bindQuestions(questions);
-    }
-
-    private void networkCallFailed() {
-        Toast.makeText(this, R.string.error_network_call_failed, Toast.LENGTH_SHORT).show();
+        mFetchQuestions.fetchAndNotify();
     }
 
     @Override
