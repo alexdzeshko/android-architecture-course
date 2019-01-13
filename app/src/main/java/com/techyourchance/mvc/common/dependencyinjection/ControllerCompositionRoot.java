@@ -3,10 +3,10 @@ package com.techyourchance.mvc.common.dependencyinjection;
 import android.app.Activity;
 import android.view.LayoutInflater;
 
-import com.techyourchance.mvc.networking.StackoverflowApi;
-import com.techyourchance.mvc.questions.FetchQuestionDetailsUseCase;
-import com.techyourchance.mvc.questions.FetchQuestionsUseCase;
-import com.techyourchance.mvc.screens.common.ViewMvcFactory;
+import com.techyourchance.mvc.questions.api.stackoverflow.StackoverflowApi;
+import com.techyourchance.mvc.questions.model.FetchQuestionDetailsUseCase;
+import com.techyourchance.mvc.questions.model.FetchQuestionsUseCase;
+import com.techyourchance.mvc.questions.ui.common.ViewMvcFactory;
 
 public class ControllerCompositionRoot {
 

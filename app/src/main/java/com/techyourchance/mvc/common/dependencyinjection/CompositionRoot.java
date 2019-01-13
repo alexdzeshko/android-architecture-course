@@ -1,7 +1,7 @@
 package com.techyourchance.mvc.common.dependencyinjection;
 
 import com.techyourchance.mvc.common.Constants;
-import com.techyourchance.mvc.networking.StackoverflowApi;
+import com.techyourchance.mvc.questions.api.stackoverflow.StackoverflowApi;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
