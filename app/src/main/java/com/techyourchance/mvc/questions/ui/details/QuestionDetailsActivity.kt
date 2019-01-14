@@ -3,46 +3,18 @@ package com.techyourchance.mvc.questions.ui.details
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.techyourchance.mvc.questions.model.FetchQuestionDetailsUseCase
-import com.techyourchance.mvc.questions.model.FetchQuestionDetailsUseCase.Listener
-import com.techyourchance.mvc.questions.model.QuestionDetails
+import com.techyourchance.mvc.R
 import com.techyourchance.mvc.questions.ui.common.BaseActivity
 
 class QuestionDetailsActivity : BaseActivity() {
-    private lateinit var view: QuestionDetailsViewMvc
-    private lateinit var fetchDetails: FetchQuestionDetailsUseCase
-    private val listener = object : Listener {
-        override fun onSuccess(details: QuestionDetails) {
-            view.bindDetails(details)
-        }
-
-        override fun onError(t: Throwable) {
-            view.showError(t)
-        }
-
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        view = compositionRoot.viewMvcFactory.getQuestionDetailViewMvc()
-        fetchDetails = compositionRoot.fetchQuestionDetailsUseCase
-        setContentView(view.rootView)
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        fetchDetails.registerListener(listener)
-        loadDetails()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fetchDetails.unregisterListener(listener)
-    }
-
-    private fun loadDetails() {
-        fetchDetails.fetchAndNotify(intent.getStringExtra(EXTRA_QUESTION_ID));
+        setContentView(R.layout.app_container)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                    .add(R.id.root_container, QuestionDetailsFragment.newInst(intent.getStringExtra(EXTRA_QUESTION_ID)))
+                    .commit()
+        }
     }
 
     companion object {

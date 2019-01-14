@@ -2,8 +2,10 @@ package com.techyourchance.mvc.questions.ui.details;
 
 import android.graphics.Color;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -29,14 +31,15 @@ public class QuestionDetailsViewMvcImpl extends BaseViewMvc implements QuestionD
 
     @Override
     public void bindDetails(QuestionDetails questionDetails) {
-        Log.d(TAG, "bindDetails() called with: questionDetails = [" + questionDetails + "]");
+        findViewById(R.id.detailsProgressBar).setVisibility(View.GONE);
         ((TextView) findViewById(R.id.topicTitle)).setText(questionDetails.getTitle());
-        ((TextView) findViewById(R.id.topicBody)).setText(questionDetails.getBody());
+        ((TextView) findViewById(R.id.topicBody)).setText(Html.fromHtml(questionDetails.getBody()));
     }
 
     @Override
     public void showError(@NotNull Throwable t) {
         Log.d(TAG, "showError() called with: t = [" + t + "]");
+        findViewById(R.id.detailsProgressBar).setVisibility(View.GONE);
         ((TextView) findViewById(R.id.topicTitle)).setText("Error");
         TextView body = findViewById(R.id.topicBody);
         body.setText(t.getMessage());

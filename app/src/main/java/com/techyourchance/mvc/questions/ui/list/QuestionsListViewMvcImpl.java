@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.techyourchance.mvc.R;
@@ -44,6 +45,7 @@ public class QuestionsListViewMvcImpl extends BaseObservableViewMvc<QuestionsLis
 
     @Override
     public void bindQuestions(List<Question> questions) {
+        findViewById(R.id.listProgressBar).setVisibility(View.GONE);
         mAdapter.bindQuestions(questions);
     }
 }
