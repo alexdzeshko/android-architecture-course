@@ -3,10 +3,12 @@ package com.techyourchance.mvc.questions.model
 import com.techyourchance.mvc.common.Constants
 import com.techyourchance.mvc.common.DataListener
 import com.techyourchance.mvc.common.UseCase
-import com.techyourchance.mvc.questions.api.stackoverflow.dto.QuestionsListResponseSchema
 import com.techyourchance.mvc.questions.api.stackoverflow.StackoverflowApi
-import retrofit2.Call
-import retrofit2.Callback
+import com.techyourchance.mvc.questions.api.stackoverflow.dto.QuestionsListResponseSchema
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 
@@ -15,21 +17,25 @@ class FetchQuestionsUseCase(private val api: StackoverflowApi)
 
     interface Listener: DataListener<List<Question>>
 
-    fun fetchAndNotify() {
-        api.fetchLastActiveQuestions(Constants.QUESTIONS_LIST_PAGE_SIZE)
-                .enqueue(object : Callback<QuestionsListResponseSchema> {
-                    override fun onResponse(call: Call<QuestionsListResponseSchema>, response: Response<QuestionsListResponseSchema>) {
-                        if (response.isSuccessful) {
-                            notifySuccess(response.body())
-                        } else {
-                            notifyError(Exception())
-                        }
-                    }
+    private val uiScope = CoroutineScope(Dispatchers.Main)
 
-                    override fun onFailure(call: Call<QuestionsListResponseSchema>, t: Throwable) {
-                        notifyError(t)
-                    }
-                })
+    fun fetchAndNotify() {
+        uiScope.launch {
+            val response = loadFromNetwork()
+            handleResponse(response)
+        }
+    }
+
+    private suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
+        api.fetchLastActiveQuestions(Constants.QUESTIONS_LIST_PAGE_SIZE).execute()
+    }
+
+    private fun handleResponse(response: Response<QuestionsListResponseSchema>) {
+        if (response.isSuccessful) {
+            notifySuccess(response.body())
+        } else {
+            notifyError(Exception())
+        }
     }
 
     private fun notifyError(exception: Throwable) {
