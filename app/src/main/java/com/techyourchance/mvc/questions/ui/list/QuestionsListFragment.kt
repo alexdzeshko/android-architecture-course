@@ -29,10 +29,10 @@ class QuestionsListFragment: BaseFragment(), QuestionsListViewMvc.Listener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        mViewMvc = compositionRoot.viewMvcFactory.getQuestionsListViewMvc(null)
+        mViewMvc = questionsComponent.getViewMvcFactory().getQuestionsListViewMvc(null)
         mViewMvc?.registerListener(this)
 
-        mFetchQuestions = compositionRoot.fetchQuestionsUseCase
+        mFetchQuestions = questionsComponent.getFetchQuestionsUseCase()
 
         return mViewMvc!!.rootView
     }

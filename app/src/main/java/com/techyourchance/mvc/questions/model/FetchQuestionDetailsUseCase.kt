@@ -1,13 +1,13 @@
 package com.techyourchance.mvc.questions.model
 
 import com.techyourchance.mvc.common.UseCase
-import com.techyourchance.mvc.questions.api.stackoverflow.dto.QuestionDetailsResponseSchema
 import com.techyourchance.mvc.questions.api.stackoverflow.StackoverflowApi
+import com.techyourchance.mvc.questions.api.stackoverflow.dto.QuestionDetailsResponseSchema
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class FetchQuestionDetailsUseCase(val stackoverflowApi: StackoverflowApi) : UseCase<FetchQuestionDetailsUseCase.Listener>() {
+class FetchQuestionDetailsUseCase(private val stackoverflowApi: StackoverflowApi) : UseCase<FetchQuestionDetailsUseCase.Listener>() {
 
     interface Listener {
         fun onSuccess(details: QuestionDetails)
