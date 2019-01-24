@@ -19,7 +19,6 @@ public class App extends Application {
         mCompositionRoot = new CompositionRoot();
         appComponent = DaggerAppComponent.create();
 
-        QuestionsComponent questionsComponent = DaggerQuestionsComponent.builder().build();
     }
 
     public CompositionRoot getCompositionRoot() {
